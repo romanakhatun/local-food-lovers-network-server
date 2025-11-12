@@ -94,6 +94,7 @@ async function run() {
     // Create (Add Review)
     app.post("/reviews", async (req, res) => {
       const newReview = req.body;
+      console.log(newReview);
       const result = await reviewsCollection.insertOne(newReview);
       res.send(result);
     });
@@ -110,6 +111,13 @@ async function run() {
         .sort({ date: -1 })
         .toArray();
       res.send(reviews);
+    });
+
+    // Read (Featured Reviews - Public)
+    app.get("/featured-reviews", async (req, res) => {
+      const cursor = reviewsCollection.find().sort({ rating: -1 }).limit(6);
+      const result = await cursor.toArray();
+      res.send(result);
     });
 
     // Read (Single Review — Details Page)
