@@ -71,9 +71,7 @@ async function run() {
     const usersCollection = db.collection("users");
     const favoritesCollection = db.collection("favorites");
 
-    // ============================
-    // USER API
-    // ============================
+    // ==== USER API
     app.post("/users", async (req, res) => {
       const newUser = req.body;
       const query = { email: newUser.email };
@@ -87,9 +85,7 @@ async function run() {
       res.send(result);
     });
 
-    // ============================
-    // REVIEWS API (CRUD)
-    // ============================
+    // ==== REVIEWS API (CRUD)
 
     // Create (Add Review)
     app.post("/reviews", async (req, res) => {
@@ -131,12 +127,12 @@ async function run() {
     // Read (My Reviews — Protected)
     app.get("/my-reviews", async (req, res) => {
       const email = req.query.email;
-      if (email !== req.token_email) {
-        return res.status(403).send({ message: "forbidden" });
-      }
+      // if (email !== req.token_email) {
+      //   return res.status(403).send({ message: "forbidden" });
+      // }
 
       const myReviews = await reviewsCollection
-        .find({ userEmail: email })
+        .find({ email: email })
         .sort({ date: -1 })
         .toArray();
       res.send(myReviews);
@@ -171,9 +167,7 @@ async function run() {
       res.send(result);
     });
 
-    // ============================
-    // FAVORITES API
-    // ============================
+    // ==== FAVORITES API
 
     // Add to Favorites
     app.post("/favorites", async (req, res) => {
@@ -195,9 +189,7 @@ async function run() {
       res.send(favorites);
     });
 
-    // ============================
-    // MongoDB Connection Check
-    // ============================
+    // ===== MongoDB Connection Check
     // await client.db("admin").command({ ping: 1 });
     console.log("MongoDB Connected Successfully!");
   } finally {
