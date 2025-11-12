@@ -1,7 +1,7 @@
 // === Local Food Lovers Network Server
 const express = require("express");
 const cors = require("cors");
-const admin = require("firebase-admin");
+// const admin = require("firebase-admin");
 require("dotenv").config();
 const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
 
@@ -10,44 +10,43 @@ const app = express();
 const port = process.env.PORT || 3000;
 
 // Firebase Admin Initialization
-const decoded = Buffer.from(
-  process.env.FIREBASE_SERVICE_KEY,
-  "base64"
-).toString("utf8");
-const serviceAccount = JSON.parse(decoded);
+// const decoded = Buffer.from(
+//   process.env.FIREBASE_SERVICE_KEY,
+//   "base64"
+// ).toString("utf8");
+// const serviceAccount = JSON.parse(decoded);
 
-admin.initializeApp({
-  credential: admin.credential.cert(serviceAccount),
-});
+// admin.initializeApp({
+//   credential: admin.credential.cert(serviceAccount),
+// });
 
 // Middlewares
 app.use(cors());
 app.use(express.json());
 
 // ------------------ Firebase Token Verify Middleware ------------------
-const verifyFirebaseToken = async (req, res, next) => {
-  const authorization = req.headers.authorization;
-  if (!authorization) {
-    return res.status(401).send({ message: "unauthorized access" });
-  }
+// const verifyFirebaseToken = async (req, res, next) => {
+//   const authorization = req.headers.authorization;
+//   if (!authorization) {
+//     return res.status(401).send({ message: "unauthorized access" });
+//   }
 
-  const token = authorization.split(" ")[1];
-  if (!token) {
-    return res.status(401).send({ message: "unauthorized access" });
-  }
+//   const token = authorization.split(" ")[1];
+//   if (!token) {
+//     return res.status(401).send({ message: "unauthorized access" });
+//   }
 
-  try {
-    const decoded = await admin.auth().verifyIdToken(token);
-    req.token_email = decoded.email;
-    next();
-  } catch {
-    return res.status(401).send({ message: "unauthorized access" });
-  }
-};
+//   try {
+//     const decoded = await admin.auth().verifyIdToken(token);
+//     req.token_email = decoded.email;
+//     next();
+//   } catch {
+//     return res.status(401).send({ message: "unauthorized access" });
+//   }
+// };
 
 // ------------------ MongoDB Setup ------------------
-console.log(process.env);
-
+// console.log(process.env);
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASSWORD}@cluster0.nbrbbe5.mongodb.net/?retryWrites=true&w=majority`;
 const client = new MongoClient(uri, {
   serverApi: {
@@ -93,7 +92,7 @@ async function run() {
     // ============================
 
     // Create (Add Review)
-    app.post("/reviews", verifyFirebaseToken, async (req, res) => {
+    app.post("/reviews", async (req, res) => {
       const newReview = req.body;
       const result = await reviewsCollection.insertOne(newReview);
       res.send(result);
@@ -122,7 +121,7 @@ async function run() {
     });
 
     // Read (My Reviews — Protected)
-    app.get("/my-reviews", verifyFirebaseToken, async (req, res) => {
+    app.get("/my-reviews", async (req, res) => {
       const email = req.query.email;
       if (email !== req.token_email) {
         return res.status(403).send({ message: "forbidden" });
@@ -136,7 +135,7 @@ async function run() {
     });
 
     // Update Review
-    app.patch("/reviews/:id", verifyFirebaseToken, async (req, res) => {
+    app.patch("/reviews/:id", async (req, res) => {
       const id = req.params.id;
       const updateData = req.body;
 
@@ -162,6 +161,30 @@ async function run() {
       const query = { _id: new ObjectId(id) };
       const result = await reviewsCollection.deleteOne(query);
       res.send(result);
+    });
+
+    // ============================
+    // FAVORITES API
+    // ============================
+
+    // Add to Favorites
+    app.post("/favorites", async (req, res) => {
+      const favorite = req.body;
+      const result = await favoritesCollection.insertOne(favorite);
+      res.send(result);
+    });
+
+    // Get My Favorites
+    app.get("/favorites", async (req, res) => {
+      const email = req.query.email;
+      if (email !== req.token_email) {
+        return res.status(403).send({ message: "forbidden" });
+      }
+
+      const favorites = await favoritesCollection
+        .find({ userEmail: email })
+        .toArray();
+      res.send(favorites);
     });
 
     // ============================
