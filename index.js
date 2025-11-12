@@ -199,7 +199,5 @@ async function run() {
 
 run().catch(console.dir);
 
-// ------------------ Server Listener ------------------
-app.listen(port, () => {
-  console.log(`Local Food Lovers Network Server is running on port ${port}`);
-});
+module.exports = app;
+
