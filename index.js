@@ -56,9 +56,7 @@ const client = new MongoClient(uri, {
   },
 });
 
-app.get("/", (req, res) => {
-  res.send("Local Food Lovers Network Server Running!");
-});
+
 
 // ------------------ Main Function ------------------
 async function run() {
@@ -206,6 +204,8 @@ async function run() {
 }
 
 run().catch(console.dir);
-
+app.get("/", (req, res) => {
+  res.send("Local Food Lovers Network Server Running!");
+});
 module.exports = app;
 
