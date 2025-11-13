@@ -4,6 +4,7 @@ const cors = require("cors");
 const admin = require("firebase-admin");
 require("dotenv").config();
 const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
+const { attachDatabasePool } = require('@vercel/functions');
 
 // ------------------ Config ------------------
 const app = express();
@@ -49,12 +50,15 @@ app.use(express.json());
 // console.log(process.env);
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASSWORD}@cluster0.nbrbbe5.mongodb.net/?retryWrites=true&w=majority`;
 const client = new MongoClient(uri, {
+  maxIdleTimeMS: 5000,
   serverApi: {
     version: ServerApiVersion.v1,
     strict: true,
     deprecationErrors: true,
   },
 });
+
+attachDatabasePool(client);
 
 // ------------------ Main Function ------------------
 async function run() {
