@@ -1,7 +1,7 @@
 // === Local Food Lovers Network Server
 const express = require("express");
 const cors = require("cors");
-// const admin = require("firebase-admin");
+const admin = require("firebase-admin");
 require("dotenv").config();
 const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
 
@@ -10,15 +10,15 @@ const app = express();
 const port = process.env.PORT || 3000;
 
 // Firebase Admin Initialization
-// const decoded = Buffer.from(
-//   process.env.FIREBASE_SERVICE_KEY,
-//   "base64"
-// ).toString("utf8");
-// const serviceAccount = JSON.parse(decoded);
+const decoded = Buffer.from(
+  process.env.FIREBASE_SERVICE_KEY,
+  "base64"
+).toString("utf8");
+const serviceAccount = JSON.parse(decoded);
 
-// admin.initializeApp({
-//   credential: admin.credential.cert(serviceAccount),
-// });
+admin.initializeApp({
+  credential: admin.credential.cert(serviceAccount),
+});
 
 // Middlewares
 app.use(cors());
@@ -54,10 +54,6 @@ const client = new MongoClient(uri, {
     strict: true,
     deprecationErrors: true,
   },
-});
-
-app.get("/", (req, res) => {
-  res.send("Local Food Lovers Network Server Running!");
 });
 
 // ------------------ Main Function ------------------
@@ -141,6 +137,8 @@ async function run() {
     // Update Review
     app.patch("/reviews/:id", async (req, res) => {
       const id = req.params.id;
+      console.log(id);
+
       const updateData = req.body;
 
       const query = { _id: new ObjectId(id) };
@@ -179,14 +177,22 @@ async function run() {
     // Get My Favorites
     app.get("/favorites", async (req, res) => {
       const email = req.query.email;
-      if (email !== req.token_email) {
-        return res.status(403).send({ message: "forbidden" });
-      }
+      // if (email !== req.token_email) {
+      //   return res.status(403).send({ message: "forbidden" });
+      // }
 
       const favorites = await favoritesCollection
-        .find({ userEmail: email })
+        .find({ email: email })
         .toArray();
       res.send(favorites);
+    });
+
+    // Delete from Favorites
+    app.delete("/favorites/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) };
+      const result = await favoritesCollection.deleteOne(query);
+      res.send(result);
     });
 
     // ===== MongoDB Connection Check
@@ -198,6 +204,11 @@ async function run() {
 }
 
 run().catch(console.dir);
+app.get("/", (req, res) => {
+  res.send("Local Food Lovers Network Server Running!");
+});
 
-module.exports = app;
-
+app.listen(port, () => {
+  console.log(`Smart server is running on port: ${port}`);
+});
+// module.exports = app;
