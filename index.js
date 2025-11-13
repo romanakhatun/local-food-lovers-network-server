@@ -48,15 +48,17 @@ app.use(express.json());
 
 // ------------------ MongoDB Setup ------------------
 // console.log(process.env);
-const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASSWORD}@cluster0.nbrbbe5.mongodb.net/?retryWrites=true&w=majority`;
-const client = new MongoClient(uri, {
+const options = {
+  appName: 'devrel.vercel.integration',
   maxIdleTimeMS: 5000,
   serverApi: {
     version: ServerApiVersion.v1,
     strict: true,
     deprecationErrors: true,
   },
-});
+};
+
+const client = new MongoClient(process.env.MONGODB_URI, options);
 
 attachDatabasePool(client);
 
