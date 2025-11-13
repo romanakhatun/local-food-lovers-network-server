@@ -208,7 +208,7 @@ app.get("/", (req, res) => {
   res.send("Local Food Lovers Network Server Running!");
 });
 
-app.listen(port, () => {
-  console.log(`Smart server is running on port: ${port}`);
-});
-// module.exports = app;
+// app.listen(port, () => {
+//   console.log(`Smart server is running on port: ${port}`);
+// });
+module.exports = app;
