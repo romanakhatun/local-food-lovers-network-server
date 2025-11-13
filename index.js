@@ -59,7 +59,6 @@ const client = new MongoClient(uri, {
 // ------------------ Main Function ------------------
 async function run() {
   try {
-    await client.connect();
     const db = client.db("local_food_db");
 
     // Collections
@@ -196,10 +195,8 @@ async function run() {
     });
 
     // ===== MongoDB Connection Check
-    // await client.db("admin").command({ ping: 1 });
     console.log("MongoDB Connected Successfully!");
   } finally {
-    // await client.close();
   }
 }
 
@@ -208,7 +205,6 @@ app.get("/", (req, res) => {
   res.send("Local Food Lovers Network Server Running!");
 });
 
-// app.listen(port, () => {
-//   console.log(`Smart server is running on port: ${port}`);
-// });
-module.exports = app;
+app.listen(port, () => {
+  console.log(`Smart server is running on port: ${port}`);
+});
