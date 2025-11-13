@@ -50,7 +50,7 @@ app.use(express.json());
 // console.log(process.env);
 const options = {
   appName: 'devrel.vercel.integration',
-  maxIdleTimeMS: 5000,
+  maxIdleTimeMS: 30000,
   serverApi: {
     version: ServerApiVersion.v1,
     strict: true,
