@@ -46,14 +46,19 @@ app.use(express.json());
 // };
 
 // ------------------ MongoDB Setup ------------------
-// console.log(process.env);
-const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASSWORD}@cluster0.nbrbbe5.mongodb.net/?retryWrites=true&w=majority`;
+const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASSWORD}@cluster0.vyznij5.mongodb.net/?appName=Cluster0`;
+console.log(uri);
+
 const client = new MongoClient(uri, {
   serverApi: {
     version: ServerApiVersion.v1,
     strict: true,
     deprecationErrors: true,
   },
+});
+
+app.get("/", (req, res) => {
+  res.send("Local Food Lovers Network Server Running!");
 });
 
 // ------------------ Main Function ------------------
@@ -201,9 +206,6 @@ async function run() {
 }
 
 run().catch(console.dir);
-app.get("/", (req, res) => {
-  res.send("Local Food Lovers Network Server Running!");
-});
 
 app.listen(port, () => {
   console.log(`Smart server is running on port: ${port}`);
